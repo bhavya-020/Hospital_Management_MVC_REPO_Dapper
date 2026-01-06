@@ -1,19 +1,23 @@
-﻿using Dapper;
-using Hospital_Management.Models;
+﻿using Hospital_Management.Models;
+using Hospital_Management.Repositories;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
-using System.Data;
 
 namespace Hospital_Management.Controllers
 {
     public class AppointmentController : Controller
     {
-        private readonly string _con;
+        private readonly IAppointmentRepository _repo;
+        private readonly IDoctorRepository _doctorRepo;
+        private readonly IPatientRepository _patientRepo;
 
-        public AppointmentController(IConfiguration configuration)
+        public AppointmentController(
+            IAppointmentRepository repo,
+            IDoctorRepository doctorRepo,
+            IPatientRepository patientRepo)
         {
-            _con = configuration.GetConnectionString("dbcon");
+            _repo = repo;
+            _doctorRepo = doctorRepo;
+            _patientRepo = patientRepo;
         }
 
         // ================= INDEX =================
@@ -25,26 +29,17 @@ namespace Hospital_Management.Controllers
             int page = 1)
         {
             int pageSize = 10;
-            using var db = new SqlConnection(_con);
 
-            var parameters = new DynamicParameters();
-            parameters.Add("@SearchType", searchType);
-            parameters.Add("@SearchText", searchText);
-            parameters.Add("@FromDate", fromDate);
-            parameters.Add("@ToDate", toDate);
-            parameters.Add("@Page", page);
-            parameters.Add("@PageSize", pageSize);
-
-            using var multi = db.QueryMultiple(
-                "sp_Appointment_GetAll_Filtered",
-                parameters,
-                commandType: CommandType.StoredProcedure
+            var result = _repo.GetFiltered(
+                searchType,
+                searchText,
+                fromDate,
+                toDate,
+                page,
+                pageSize
             );
 
-            var data = multi.Read<AppointmentModel>().ToList();
-            int totalRecords = multi.Read<int>().Single();
-
-            ViewBag.TotalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
+            ViewBag.TotalPages = (int)Math.Ceiling(result.TotalRecords / (double)pageSize);
             ViewBag.CurrentPage = page;
 
             ViewBag.SearchType = searchType;
@@ -52,118 +47,78 @@ namespace Hospital_Management.Controllers
             ViewBag.FromDate = fromDate?.ToString("yyyy-MM-dd");
             ViewBag.ToDate = toDate?.ToString("yyyy-MM-dd");
 
-            return View(data);
+            return View(result.Data);
         }
 
-        // ================= CREATE (GET) =================
+        // ================= CREATE =================
         public IActionResult Create()
         {
-            using var db = new SqlConnection(_con);
-            ViewBag.Doctors = db.Query<DoctorModel>("sp_Doctor_GetAll", commandType: CommandType.StoredProcedure);
-            ViewBag.Patients = db.Query<PatientModel>("sp_Patient_GetAll", commandType: CommandType.StoredProcedure);
+            ViewBag.Doctors = _doctorRepo.GetAll();
+            ViewBag.Patients = _patientRepo.GetAll();
             return View();
         }
 
-        // ================= CREATE (POST) =================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(AppointmentModel m)
         {
-            using var db = new SqlConnection(_con);
-
             if (!ModelState.IsValid)
             {
-                ViewBag.Doctors = db.Query<DoctorModel>("sp_Doctor_GetAll", commandType: CommandType.StoredProcedure);
-                ViewBag.Patients = db.Query<PatientModel>("sp_Patient_GetAll", commandType: CommandType.StoredProcedure);
+                ViewBag.Doctors = _doctorRepo.GetAll();
+                ViewBag.Patients = _patientRepo.GetAll();
                 return View(m);
             }
 
-            var parameters = new DynamicParameters();
-            parameters.Add("@DoctorId", m.DoctorId);
-            parameters.Add("@PatientId", m.PatientId);
-            parameters.Add("@AppointmentDate", m.AppointmentDate);
-            parameters.Add("@AppointmentTime", m.AppointmentTime);
-            parameters.Add("@Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            int result = _repo.Insert(m);
 
-            db.Execute("sp_Appointment_Insert_With_Check", parameters, commandType: CommandType.StoredProcedure);
-
-            int result = parameters.Get<int>("@Result");
             if (result == -1)
-            {
                 ModelState.AddModelError("", "This doctor is already booked.");
-            }
             else if (result == -2)
-            {
                 ModelState.AddModelError("", "This patient already has an appointment.");
-            }
 
             if (!ModelState.IsValid)
             {
-                ViewBag.Doctors = db.Query<DoctorModel>("sp_Doctor_GetAll", commandType: CommandType.StoredProcedure);
-                ViewBag.Patients = db.Query<PatientModel>("sp_Patient_GetAll", commandType: CommandType.StoredProcedure);
+                ViewBag.Doctors = _doctorRepo.GetAll();
+                ViewBag.Patients = _patientRepo.GetAll();
                 return View(m);
             }
 
             return RedirectToAction(nameof(Index));
         }
 
-        // ================= EDIT (GET) =================
+        // ================= EDIT =================
         public IActionResult Edit(int id)
         {
-            using var db = new SqlConnection(_con);
-
-            var appt = db.QueryFirstOrDefault<AppointmentModel>(
-                "sp_Appointment_GetById",
-                new { AppointmentId = id },
-                commandType: CommandType.StoredProcedure
-            );
-
+            var appt = _repo.GetById(id);
             if (appt == null) return NotFound();
 
-            ViewBag.Doctors = db.Query<DoctorModel>("sp_Doctor_GetAll", commandType: CommandType.StoredProcedure);
-            ViewBag.Patients = db.Query<PatientModel>("sp_Patient_GetAll", commandType: CommandType.StoredProcedure);
-
+            ViewBag.Doctors = _doctorRepo.GetAll();
+            ViewBag.Patients = _patientRepo.GetAll();
             return View(appt);
         }
 
-        // ================= EDIT (POST) =================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Edit(AppointmentModel m)
         {
-            using var db = new SqlConnection(_con);
-
             if (!ModelState.IsValid)
             {
-                ViewBag.Doctors = db.Query<DoctorModel>("sp_Doctor_GetAll", commandType: CommandType.StoredProcedure);
-                ViewBag.Patients = db.Query<PatientModel>("sp_Patient_GetAll", commandType: CommandType.StoredProcedure);
+                ViewBag.Doctors = _doctorRepo.GetAll();
+                ViewBag.Patients = _patientRepo.GetAll();
                 return View(m);
             }
 
-            var parameters = new DynamicParameters();
-            parameters.Add("@AppointmentId", m.AppointmentId);
-            parameters.Add("@DoctorId", m.DoctorId);
-            parameters.Add("@PatientId", m.PatientId);
-            parameters.Add("@AppointmentDate", m.AppointmentDate);
-            parameters.Add("@AppointmentTime", m.AppointmentTime);
-            parameters.Add("@Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            int result = _repo.Update(m);
 
-            db.Execute("sp_Appointment_Update_With_Check", parameters, commandType: CommandType.StoredProcedure);
-
-            int result = parameters.Get<int>("@Result");
             if (result == -1)
-            {
                 ModelState.AddModelError("", "This doctor is already booked.");
-            }
             else if (result == -2)
-            {
                 ModelState.AddModelError("", "This patient already has an appointment.");
-            }
 
             if (!ModelState.IsValid)
             {
-                ViewBag.Doctors = db.Query<DoctorModel>("sp_Doctor_GetAll", commandType: CommandType.StoredProcedure);
-                ViewBag.Patients = db.Query<PatientModel>("sp_Patient_GetAll", commandType: CommandType.StoredProcedure);
+                ViewBag.Doctors = _doctorRepo.GetAll();
+                ViewBag.Patients = _patientRepo.GetAll();
                 return View(m);
             }
 
@@ -173,8 +128,7 @@ namespace Hospital_Management.Controllers
         // ================= DELETE =================
         public IActionResult Delete(int id)
         {
-            using var db = new SqlConnection(_con);
-            db.Execute("sp_Appointment_Delete", new { AppointmentId = id }, commandType: CommandType.StoredProcedure);
+            _repo.Delete(id);
             return RedirectToAction(nameof(Index));
         }
     }

@@ -614,7 +614,7 @@ END
 //    SET NOCOUNT ON;
 
 //    DECLARE @Today DATE = CAST(GETDATE() AS DATE);
-    
+
 //    ;WITH Filtered AS (
 //        SELECT
 //            a.AppointmentId,
@@ -879,7 +879,7 @@ END
 //    SET NOCOUNT ON;
 
 //    DECLARE @Today DATE = CAST(GETDATE() AS DATE);
-    
+
 //    ;WITH Filtered AS (
 //        SELECT
 //            a.AppointmentId,
@@ -1130,4 +1130,49 @@ END
 
 
 //zxcxzcfsdfsdfds///repo dapper
+
+
+
+
+//use HospitalDB;
+
+//select* from doctors
+
+//CREATE PROCEDURE sp_Doctor_GetById
+//    @DoctorId INT
+//AS
+//BEGIN
+//    SET NOCOUNT ON;
+
+//SELECT
+//    DoctorId,
+//    DoctorName,
+//    Specialization,
+//    WorkPlace,
+//    Experience
+//    FROM Doctors
+//    WHERE DoctorId = @DoctorId;
+//END
+//GO
+
+//select * from Patients
+
+//CREATE PROCEDURE sp_Patient_GetById
+//    @PatientId INT
+//AS
+//BEGIN
+//    SET NOCOUNT ON;
+
+//SELECT
+//    PatientId,
+//    PatientName,
+//    Age,
+//    Gender,
+//    Contact
+//    FROM Patients
+//    WHERE PatientId = @PatientId;
+//END
+//GO
+
+
 
