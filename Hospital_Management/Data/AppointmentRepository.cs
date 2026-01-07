@@ -1,11 +1,12 @@
 ﻿using Dapper;
 using Hospital_Management.Models;
+using Hospital_Management.Repositories;
 using Microsoft.Data.SqlClient;
 using System.Data;
 
 
 
-namespace Hospital_Management.Repositories
+namespace Hospital_Management.Data
 {
     public class AppointmentRepository : IAppointmentRepository
     {

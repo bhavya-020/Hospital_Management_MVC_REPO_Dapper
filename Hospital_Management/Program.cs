@@ -1,3 +1,4 @@
+using Hospital_Management.Data;
 using Hospital_Management.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
