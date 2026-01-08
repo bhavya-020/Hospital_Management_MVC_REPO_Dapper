@@ -10,7 +10,9 @@
     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
     <div class="form-group">
-        @Html.TextBoxFor(x => x.DoctorName, new { @class = "form-control", placeholder = "Doctor Name" })
+        @Html.TextBoxFor(x => x.DoctorName, new { @class = "form-control", placeholder = "Doctor Name" ,onkeypress = "return allowOnlyAlphabets(event)",
+        onpaste = "return false",
+        autocomplete = "off"})
         @Html.ValidationMessageFor(x => x.DoctorName, "", new { @class = "text-danger" })
     </div>
 
@@ -24,7 +26,7 @@
 </div> *@
 
     <div class="form-group">
-        @Html.LabelFor(x => x.Specialization)
+    @*     @Html.LabelFor(x => x.Specialization)
         @Html.DropDownListFor(
         x => x.Specialization,
         new List<SelectListItem>
@@ -38,17 +40,70 @@
         "-- Select Specialization --",
         new { @class = "form-control", onchange = "toggleOther()" }
         )
-    @Html.ValidationMessageFor(x => x.Specialization)
+    @Html.ValidationMessageFor(x => x.Specialization) *@
+
+
+
+
+    <div class="form-group">
+        <label>Specialization</label>
+         
+
+        @Html.DropDownListFor(
+                m => m.Specialization,
+                new SelectList(new[]
+                {
+                "-- Select Specialization --",
+                "Cardiologist",
+                "Dermatologist",
+                "Neurologist",
+                "Orthopedic",
+                "Other"
+                }),
+                new { @class = "form-control", id = "specializationDropdown" }
+                )
+    </div>
+
+    <div class="form-group" id="otherSpecDiv" style="display:none;">
+        <label>Enter Specialization</label>
+        <input type="text"
+               id="otherSpecialization"
+               class="form-control"
+               placeholder="Enter specialization"
+               onkeypress="return allowOnlyAlphabets(event)"
+               onpaste="return false"
+               pattern="[A-Za-z ]+"
+               autocomplete="off" />
+
+
+    </div>
+
 </div>
 
     <div class="form-group">
-        @Html.TextBoxFor(x => x.WorkPlace, new { @class = "form-control", placeholder = "Workplace" })
-        @Html.ValidationMessageFor(x => x.WorkPlace, "", new { @class = "text-danger" })
+    @Html.TextBoxFor(x => x.WorkPlace, new {
+        @class = "form-control",
+        placeholder = "Workplace",
+        onkeypress = "return allowOnlyAlphabets(event)",
+        onpaste = "return false",
+        autocomplete = "off"
+        })
+    @Html.ValidationMessageFor(x => x.WorkPlace, "", new { @class = "text-danger" })
+
     </div>
 
+
     <div class="form-group">
-    @Html.TextBoxFor(x => x.Experience, new { @class = "form-control", type = "number", min = "0", max = "70", step = "1", placeholder = "Experience in years" })
+
+    @Html.TextBoxFor(x => x.Experience, new {
+        @class = "form-control",
+        placeholder = "Experience in years",
+        inputmode = "numeric",
+        pattern = "[0-9]*",
+        onkeypress = "return isNumberKey(event)"
+        })
     @Html.ValidationMessageFor(x => x.Experience, "", new { @class = "text-danger" })
+
     </div>
 
     <br />
@@ -56,12 +111,54 @@
 }
 
 <script>
-    // function toggleOther() {
-    //     var spec = document.getElementById("Specialization").value;
-    //     document.getElementById("otherDiv").style.display =
-    //         spec === "Other" ? "block" : "none";
-    // }
+    // allow only numbers
+    function isNumberKey(evt) {
+        var charCode = evt.which ? evt.which : evt.keyCode;
+        return charCode >= 48 && charCode <= 57;
+    }
+
+    // wait until page loads
+    document.addEventListener("DOMContentLoaded", function () {
+
+        var dropdown = document.getElementById("specializationDropdown");
+        var otherDiv = document.getElementById("otherSpecDiv");
+        var otherInput = document.getElementById("otherSpecialization");
+
+        dropdown.addEventListener("change", function () {
+
+            if (this.value === "Other") {
+                otherDiv.style.display = "block";
+
+                // switch MVC binding
+                dropdown.name = "";
+                otherInput.name = "Specialization";
+
+            } else {
+                otherDiv.style.display = "none";
+
+                dropdown.name = "Specialization";
+                otherInput.name = "";
+                otherInput.value = "";
+            }
+        });
+    });
+
+    function allowOnlyAlphabets(evt) {
+        var charCode = evt.which ? evt.which : evt.keyCode;
+
+        // A–Z (65–90), a–z (97–122), space (32)
+        if (
+            (charCode >= 65 && charCode <= 90) ||
+            (charCode >= 97 && charCode <= 122) ||
+            charCode === 32
+        ) {
+            return true;
+        }
+        return false;
+    }
 </script>
+
+
 
 
 

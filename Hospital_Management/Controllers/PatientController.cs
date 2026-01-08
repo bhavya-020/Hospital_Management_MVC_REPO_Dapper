@@ -19,6 +19,7 @@ namespace Hospital_Management.Controllers
             return View(patients);
         }
 
+
         public IActionResult Create()
         {
             return View();
@@ -58,7 +59,19 @@ namespace Hospital_Management.Controllers
 
         public IActionResult Delete(int id)
         {
-            _repo.Delete(id);
+            //_repo.Delete(id);
+            //return RedirectToAction(nameof(Index));
+
+            try
+            {
+                _repo.Delete(id);
+                TempData["Success"] = "Patient deleted successfully.";
+            }
+            catch
+            {
+                TempData["Error"] = "Cannot delete patient because appointments are already booked.";
+            }
+
             return RedirectToAction(nameof(Index));
         }
     }

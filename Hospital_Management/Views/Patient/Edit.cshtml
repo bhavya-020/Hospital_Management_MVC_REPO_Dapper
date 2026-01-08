@@ -11,15 +11,27 @@
     @Html.HiddenFor(x => x.PatientId)
 
     <div class="form-group">
-        @Html.TextBoxFor(x => x.PatientName,
-        new { @class = "form-control", placeholder = "Patient Name" })
+        @Html.TextBoxFor(x => x.PatientName, new {
+        @class = "form-control",
+        placeholder = "Patient Name",
+        onkeypress = "return allowOnlyAlphabets(event)",
+        onpaste = "return false",
+        autocomplete = "off"
+        })
     @Html.ValidationMessageFor(x => x.PatientName, "", new { @class = "text-danger" })
+
 </div>
 
 <div class="form-group">
-    @Html.TextBoxFor(x => x.Age,
-        new { @class = "form-control", placeholder = "Age", type = "number" })
+    @Html.TextBoxFor(x => x.Age, new {
+        @class = "form-control",
+        placeholder = "Age",
+        inputmode = "numeric",
+        maxlength = "3",
+        onkeypress = "return allowOnlyNumbers(event)"
+        })
     @Html.ValidationMessageFor(x => x.Age, "", new { @class = "text-danger" })
+
 </div>
 
 <div class="form-group">
@@ -35,9 +47,21 @@
 
 
 <div class="form-group">
-    @Html.TextBoxFor(x => x.Contact,
-        new { @class = "form-control", placeholder = "Contact" })
+    @Html.TextBoxFor(x => x.Contact, new {
+        @class = "form-control",
+        placeholder = "Mobile Number",
+        maxlength = "10",
+        inputmode = "numeric",
+        pattern = "[0-9]*",
+        onkeypress = "return allowOnlyNumbers(event)",
+        onpaste = "return false",
+        autocomplete = "off"
+        })
     @Html.ValidationMessageFor(x => x.Contact, "", new { @class = "text-danger" })
+
+    @* @Html.TextBoxFor(x => x.Contact,
+        new { @class = "form-control", placeholder = "Contact" })
+    @Html.ValidationMessageFor(x => x.Contact, "", new { @class = "text-danger" }) *@
 </div>
 
 <br />
@@ -45,6 +69,33 @@
 <input type="submit" value="Update" class="btn btn-warning" />
 }
 
+<script>
+    function allowOnlyAlphabets(evt) {
+        var charCode = evt.which ? evt.which : evt.keyCode;
+        // A-Z a-z space
+        if (
+            (charCode >= 65 && charCode <= 90) ||
+            (charCode >= 97 && charCode <= 122) ||
+            charCode === 32
+        ) return true;
+
+        return false;
+    }
+
+        function allowOnlyNumbers(evt) {
+        var charCode = evt.which ? evt.which : evt.keyCode;
+
+        // Allow backspace, delete
+        if (charCode === 8 || charCode === 46)
+            return true;
+
+        // Allow only 0–9
+        if (charCode < 48 || charCode > 57)
+            return false;
+
+        return true;
+    }
+</script>
 
 
 

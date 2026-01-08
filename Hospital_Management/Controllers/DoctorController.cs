@@ -90,7 +90,16 @@ namespace Hospital_Management.Controllers
 
         public IActionResult Delete(int id)
         {
-            _repo.Delete(id);
+
+            try
+            {
+                _repo.Delete(id);
+                TempData["Success"] = "Doctor deleted successfully.";
+            }
+            catch
+            {
+                TempData["Error"] = "Cannot delete doctor because appointments are already booked.";
+            }
             return RedirectToAction(nameof(Index));
         }
 

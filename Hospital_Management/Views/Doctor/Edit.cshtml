@@ -7,47 +7,133 @@
 
 @using (Html.BeginForm())
 {
-    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-
     @Html.HiddenFor(x => x.DoctorId)
 
     <div class="form-group">
-        @Html.TextBoxFor(x => x.DoctorName, new { @class = "form-control", placeholder = "Doctor Name" })
-        @Html.ValidationMessageFor(x => x.DoctorName, "", new { @class = "text-danger" })
+        @Html.TextBoxFor(x => x.DoctorName, new { @class = "form-control" ,
+        placeholder = "Doctor Name",
+        onkeypress = "return allowOnlyAlphabets(event)",
+        onpaste = "return false",
+        autocomplete = "off"})
+    @Html.ValidationMessageFor(x => x.DoctorName, "", new { @class = "text-danger" })
+
     </div>
 
     <div class="form-group">
-        @Html.LabelFor(x => x.Specialization)
+        <label>Specialization</label>
+
         @Html.DropDownListFor(
-        x => x.Specialization,
-        new List<SelectListItem>
+        m => m.Specialization,
+        new SelectList(new[]
         {
-        new SelectListItem { Text="Cardiologist", Value="Cardiologist" },
-        new SelectListItem { Text="Dermatologist", Value="Dermatologist" },
-        new SelectListItem { Text="Neurologist", Value="Neurologist" },
-        new SelectListItem { Text="Orthopedic", Value="Orthopedic" },
-        new SelectListItem { Text="Other", Value="Other" }
-        },
+        "Cardiologist",
+        "Dermatologist",
+        "Neurologist",
+        "Orthopedic",
+        "Other"
+        }, Model.Specialization),
         "-- Select Specialization --",
-        new { @class = "form-control" }
+        new { @class = "form-control", id = "specializationDropdown" }
         )
-    @Html.ValidationMessageFor(x => x.Specialization)
 </div>
 
+<div class="form-group" id="otherSpecDiv" style="display:none;">
+    <label>Enter Specialization</label>
+    <input type="text"
+           id="otherSpecialization"
+           class="form-control"
+           value="@Model.Specialization"
+           placeholder="Enter specialization"
+           pattern="[A-Za-z ]+"
+           onkeypress="return allowOnlyAlphabets(event)"
+           onpaste="return false"
+           autocomplete="off" />
+</div>
 
-    <div class="form-group">
-        @Html.TextBoxFor(x => x.WorkPlace, new { @class = "form-control", placeholder = "Workplace" })
-        @Html.ValidationMessageFor(x => x.WorkPlace, "", new { @class = "text-danger" })
-    </div>
+<div class="form-group">
+    @Html.TextBoxFor(x => x.WorkPlace, new {
+        @class = "form-control",
+        placeholder = "Workplace",
+        onkeypress = "return allowOnlyAlphabets(event)",
+        onpaste = "return false",
+        autocomplete = "off"
+        })
+    @Html.ValidationMessageFor(x => x.WorkPlace, "", new { @class = "text-danger" })
+</div>
 
-    <div class="form-group">
-        @Html.TextBoxFor(x => x.Experience, new { @class = "form-control", placeholder = "Experience" })
-        @Html.ValidationMessageFor(x => x.Experience, "", new { @class = "text-danger" })
-    </div>
+<div class="form-group">
+    @Html.TextBoxFor(x => x.Experience, new
+        {
+            @class = "form-control",
+        inputmode = "numeric",
+        pattern = "[0-9]*",
+        onkeypress = "return isNumberKey(event)"
+        })
+</div>
 
-    <br />
-    <input type="submit" value="Update" class="btn btn-warning" />
+<br />
+<input type="submit" value="Update" class="btn btn-primary" />
 }
+
+
+
+
+<script>
+    function isNumberKey(evt) {
+        var charCode = evt.which ? evt.which : evt.keyCode;
+        return charCode >= 48 && charCode <= 57;
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        var dropdown = document.getElementById("specializationDropdown");
+        var otherDiv = document.getElementById("otherSpecDiv");
+        var otherInput = document.getElementById("otherSpecialization");
+
+        // initial load (EDIT scenario)
+        if (
+            dropdown.value !== "Cardiologist" &&
+            dropdown.value !== "Dermatologist" &&
+            dropdown.value !== "Neurologist" &&
+            dropdown.value !== "Orthopedic" &&
+            dropdown.value !== "Other"
+        ) {
+            dropdown.value = "Other";
+            otherDiv.style.display = "block";
+            dropdown.name = "";
+            otherInput.name = "Specialization";
+        }
+
+        dropdown.addEventListener("change", function () {
+
+            if (this.value === "Other") {
+                otherDiv.style.display = "block";
+                dropdown.name = "";
+                otherInput.name = "Specialization";
+            } else {
+                otherDiv.style.display = "none";
+                dropdown.name = "Specialization";
+                otherInput.name = "";
+                otherInput.value = "";
+            }
+        });
+    });
+
+    function allowOnlyAlphabets(evt) {
+        var charCode = evt.which ? evt.which : evt.keyCode;
+
+        // A–Z (65–90), a–z (97–122), space (32)
+        if (
+            (charCode >= 65 && charCode <= 90) ||
+            (charCode >= 97 && charCode <= 122) ||
+            charCode === 32
+        ) {
+            return true;
+        }
+        return false;
+    }
+</script>
+
 
 
 
