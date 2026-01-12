@@ -13,11 +13,25 @@ namespace Hospital_Management.Controllers
             _repo = repo;
         }
 
-        public IActionResult Index()
+        //public IActionResult Index()
+        //{
+        //    var patients = _repo.GetAll();
+        //    return View(patients);
+        //}
+        public IActionResult Index(string search, int page = 1)
         {
-            var patients = _repo.GetAll();
-            return View(patients);
+            int pageSize = 10;
+
+            var result = _repo.GetAllFiltered(search, page, pageSize);
+
+            ViewBag.Search = search;
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages =
+                (int)Math.Ceiling(result.totalCount / (double)pageSize);
+
+            return View(result.patients);
         }
+
 
 
         public IActionResult Create()

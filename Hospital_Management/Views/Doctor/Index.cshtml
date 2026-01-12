@@ -28,6 +28,26 @@
     <a asp-action="Create" class="btn btn-primary">Add New Doctor</a>
 </p>
 
+
+<form method="get" class="row mb-3">
+    <div class="col-md-4">
+        <input type="text"
+               name="search"
+               value="@ViewBag.Search"
+               class="form-control"
+               placeholder="Search doctor, specialization, workplace" />
+    </div>
+
+    <div class="col-md-2">
+        <button class="btn btn-primary w-100">Search</button>
+    </div>
+
+    <div class="col-md-2">
+        <a asp-action="Index" class="btn btn-secondary w-100">Clear</a>
+    </div>
+</form>
+
+
 <table class="table table-bordered table-striped">
     <thead>
         <tr>
@@ -36,9 +56,13 @@
             <th>Work Place</th>
             <th>Experience</th>
             <th>Actions</th>
+            <th>Created On</th>
         </tr>
     </thead>
     <tbody>
+        @{
+            int count = 1 + ((ViewBag.CurrentPage - 1) * 10);
+        }
         @foreach (var d in Model)
         {
             <tr>
@@ -56,7 +80,26 @@
                         Delete
                     </a>
                 </td>
+                @* <td>@d.CreatedOn.ToString(@"hh\:mm")</td> *@
+                <td>@d.CreatedOn.ToString("dd-MM-yyyy hh:mm tt")</td>
+
             </tr>
+            count++;
         }
     </tbody>
 </table>
+
+
+<nav>
+    <ul class="pagination justify-content-center">
+        @for (int i = 1; i <= (int)ViewBag.TotalPages; i++)
+        {
+            <li class="page-item @(ViewBag.CurrentPage == i ? "active" : "")">
+                <a class="page-link"
+                   href="?page=@i&search=@ViewBag.Search">
+                    @i
+                </a>
+            </li>
+        }
+    </ul>
+</nav>

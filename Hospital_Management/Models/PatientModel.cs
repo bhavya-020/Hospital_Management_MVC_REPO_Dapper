@@ -28,6 +28,8 @@ namespace Hospital_Management.Models
         [RegularExpression(@"^[6-9]\d{9}$",
             ErrorMessage = "Contact number must be 10 digits and start with 6, 7, 8, or 9")]
         public string Contact { get; set; }
+
+        public DateTime CreatedOn { get; set; }
     }
 
 }

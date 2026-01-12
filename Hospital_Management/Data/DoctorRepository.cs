@@ -50,6 +50,7 @@ namespace Hospital_Management.Data
             param.Add("@Specialization", m.Specialization);
             param.Add("@WorkPlace", m.WorkPlace);
             param.Add("@Experience", m.Experience);
+            //param.Add("@CreatedTime" , m.CreatedTime);
 
             db.Execute(
                 "sp_Doctor_Insert",
@@ -86,5 +87,35 @@ namespace Hospital_Management.Data
                 commandType: CommandType.StoredProcedure
             );
         }
+
+
+
+        //filter 
+
+        public (List<DoctorModel> doctors, int totalCount) GetAllFiltered(
+    string search,
+    int page,
+    int pageSize)
+        {
+            using var db = new SqlConnection(_con);
+
+            var param = new DynamicParameters();
+            param.Add("@Search", search);
+            param.Add("@Page", page);
+            param.Add("@PageSize", pageSize);
+
+            using var multi = db.QueryMultiple(
+                "sp_Doctor_GetAll_Filtered",
+                param,
+                commandType: CommandType.StoredProcedure
+            );
+
+            var doctors = multi.Read<DoctorModel>().ToList();
+            int totalCount = multi.Read<int>().Single();
+
+            return (doctors, totalCount);
+        }
+
+
     }
 }

@@ -1,118 +1,144 @@
 ﻿@model Hospital_Management.Models.PatientModel
 
-<h2>Add Patient</h2>
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
 
-@using (Html.BeginForm("Create", "Patient", FormMethod.Post))
-{
-    @Html.AntiForgeryToken()
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Add Patient</h4>
+                </div>
 
-    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="card-body">
 
-    <div class="form-group">
-        @Html.TextBoxFor(x => x.PatientName, new {
-        @class = "form-control",
-        placeholder = "Patient Name",
-        onkeypress = "return allowOnlyAlphabets(event)",
-        onpaste = "return false",
-        autocomplete = "off"
-        })
-    @Html.ValidationMessageFor(x => x.PatientName, "", new { @class = "text-danger" })
+                    @using (Html.BeginForm("Create", "Patient", FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger mb-3" })
 
+                        <div class="row">
+                            <!-- Patient Name -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    Patient Name <span class="text-danger">*</span>
+                                </label>
+                                @Html.TextBoxFor(x => x.PatientName, new {
+                                @class = "form-control",
+                                                        placeholder = "Enter patient name",
+                                                        onkeypress = "return allowOnlyAlphabets(event)",
+                                                        onpaste = "return false",
+                                                        autocomplete = "off"
+                                                        })
+                            @Html.ValidationMessageFor(x => x.PatientName, "", new { @class = "text-danger" })
+                        </div>
+
+                        <!-- Age -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">
+                                Age <span class="text-danger">*</span>
+                            </label>
+                            @Html.TextBoxFor(x => x.Age, new {
+                                                        @class = "form-control",
+                                                        placeholder = "Age",
+                                                        inputmode = "numeric",
+                                                        maxlength = "3",
+                                                        onkeypress = "return allowOnlyNumbers(event)"
+                                                        })
+                            @Html.ValidationMessageFor(x => x.Age, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <!-- Gender -->
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Gender <span class="text-danger">*</span>
+                        </label>
+
+                        <div class="d-flex gap-4 mt-1">
+                            <div class="form-check">
+                                @Html.RadioButtonFor(m => m.Gender, "Male", new { @class = "form-check-input", id = "Male" })
+                                <label class="form-check-label" for="Male">Male</label>
+                            </div>
+
+                            <div class="form-check">
+                                @Html.RadioButtonFor(m => m.Gender, "Female", new { @class = "form-check-input", id = "Female" })
+                                <label class="form-check-label" for="Female">Female</label>
+                            </div>
+
+                            <div class="form-check">
+                                @Html.RadioButtonFor(m => m.Gender, "Other", new { @class = "form-check-input", id = "Other" })
+                                <label class="form-check-label" for="Other">Other</label>
+                            </div>
+                        </div>
+
+                        @Html.ValidationMessageFor(m => m.Gender, "", new { @class = "text-danger" })
+                    </div>
+
+                    <!-- Contact -->
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Mobile Number <span class="text-danger">*</span>
+                        </label>
+                        @Html.TextBoxFor(x => x.Contact, new {
+                                                @class = "form-control",
+                                                placeholder = "10-digit mobile number",
+                                                maxlength = "10",
+                                                inputmode = "numeric",
+                                                pattern = "[0-9]*",
+                                                onkeypress = "return allowOnlyNumbers(event)",
+                                                onpaste = "return false",
+                                                autocomplete = "off"
+                                                })
+                        @Html.ValidationMessageFor(x => x.Contact, "", new { @class = "text-danger" })
+                    </div>
+                    @* <div class="form-group">
+                        <label>Time</label>
+                        @Html.TextBoxFor(x => x.CreatedTime, new {
+                                                @class = "form-control",
+                                                type = "time"
+                                                })
+                    </div> *@
+
+
+                    <hr />
+
+                    <!-- Buttons -->
+                    <div class="d-flex justify-content-end gap-2">
+                        <a asp-action="Index" class="btn btn-secondary">
+                            Cancel
+                        </a>
+                        <button type="submit" class="btn btn-success px-4">
+                            Save Patient
+                        </button>
+                    </div>
+                                        }
+
+                </div>
+            </div>
+
+        </div>
+    </div>
 </div>
-
-<div class="form-group">
-    @Html.TextBoxFor(x => x.Age, new {
-        @class = "form-control",
-        placeholder = "Age",
-        inputmode = "numeric",
-        maxlength = "3",
-        onkeypress = "return allowOnlyNumbers(event)"
-        })
-    @Html.ValidationMessageFor(x => x.Age, "", new { @class = "text-danger" })
-
-</div>
-
-<div class="form-group">
-    <label>Gender</label><br />
-
-    @Html.RadioButtonFor(m => m.Gender, "Male") Male
-    @Html.RadioButtonFor(m => m.Gender, "Female") Female
-    @Html.RadioButtonFor(m => m.Gender, "Other") Other
-
-    <br />
-    @Html.ValidationMessageFor(m => m.Gender, "", new { @class = "text-danger" })
-</div>
-
-<div class="form-group">
-    @Html.TextBoxFor(x => x.Contact, new {
-        @class = "form-control",
-        placeholder = "Mobile Number",
-        maxlength = "10",
-        inputmode = "numeric",
-        pattern = "[0-9]*",
-        onkeypress = "return allowOnlyNumbers(event)",
-        onpaste = "return false",
-        autocomplete = "off"
-        })
-    @Html.ValidationMessageFor(x => x.Contact, "", new { @class = "text-danger" })
-</div>
-
-<br />
-<input type="submit" value="Save" class="btn btn-success" />
-}
-
 
 
 <script>
     function allowOnlyAlphabets(evt) {
         var charCode = evt.which ? evt.which : evt.keyCode;
-        // A-Z a-z space
-        if (
+        return (
             (charCode >= 65 && charCode <= 90) ||
             (charCode >= 97 && charCode <= 122) ||
             charCode === 32
-        ) return true;
-
-        return false;
+        );
     }
 
-        function allowOnlyNumbers(evt) {
+    function allowOnlyNumbers(evt) {
         var charCode = evt.which ? evt.which : evt.keyCode;
 
-        // Allow backspace, delete
+        // Allow backspace & delete
         if (charCode === 8 || charCode === 46)
             return true;
 
-        // Allow only 0–9
-        if (charCode < 48 || charCode > 57)
-            return false;
-
-        return true;
+        // Allow 0–9 only
+        return charCode >= 48 && charCode <= 57;
     }
 </script>
-
-
-
-@* @{
-}
-@model Hospital_Management.Models.PatientModel
-
-<h2>Add Patient</h2>
-
-@using (Html.BeginForm())
-{
-    @Html.TextBoxFor(x => x.PatientName,
-    new { @class = "form-control", placeholder = "Patient Name" })
-
-@Html.TextBoxFor(x => x.Age,
-        new { @class = "form-control", placeholder = "Age", type = "number" })
-
-@Html.TextBoxFor(x => x.Gender,
-        new { @class = "form-control", placeholder = "Gender" })
-
-@Html.TextBoxFor(x => x.Contact,
-        new { @class = "form-control", placeholder = "Contact Number" })
-
-<br />
-<input type="submit" value="Save" class="btn btn-success" />
-} *@

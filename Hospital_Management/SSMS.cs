@@ -1176,3 +1176,71 @@ END
 
 
 
+//using static System.Runtime.InteropServices.JavaScript.JSType;
+
+/////SSSSSSSSPPPPPPPPP
+/////
+/////****** Object:  StoredProcedure [dbo].[sp_Appointment_GetAll_Filtered]    Script Date: 1/5/2026 11:03:15 AM ******/
+/////****** Object:  StoredProcedure [dbo].[sp_Appointment_GetAll_Filtered]    Script Date: 1/5/2026 11:03:15 AM ******/
+//use HospitalDB
+
+//CREATE OR ALTER PROCEDURE sp_Doctor_GetAll_Filtered
+//(
+//    @Search NVARCHAR(100) = NULL,
+//    @Page INT = 1,
+//    @PageSize INT = 10
+//)
+//AS
+//BEGIN
+//    SET NOCOUNT ON;
+
+//DECLARE @Offset INT = (@Page - 1) * @PageSize;
+
+//--MAIN DATA
+//    SELECT *
+//    FROM Doctors
+//    WHERE
+//        (@Search IS NULL OR
+//         DoctorName LIKE '%' + @Search + '%' OR
+//         Specialization LIKE '%' + @Search + '%' OR
+//         WorkPlace LIKE '%' + @Search + '%')
+//    ORDER BY DoctorId DESC
+//    OFFSET @Offset ROWS
+//    FETCH NEXT @PageSize ROWS ONLY;
+
+//--TOTAL COUNT
+//SELECT COUNT(*)
+//    FROM Doctors
+//    WHERE
+//        (@Search IS NULL OR
+//         DoctorName LIKE '%' + @Search + '%' OR
+//         Specialization LIKE '%' + @Search + '%' OR
+//         WorkPlace LIKE '%' + @Search + '%');
+//END
+
+
+//CREATE OR ALTER PROCEDURE sp_Patient_GetAll_Filtered
+//    @Search NVARCHAR(100),
+//    @Page INT,
+//    @PageSize INT
+//AS
+//BEGIN
+//    SET NOCOUNT ON;
+
+//IF @Search IS NULL SET @Search = '';
+
+//--MAIN DATA
+//    SELECT *
+//    FROM Patients
+//    WHERE PatientName LIKE '%' + @Search + '%'
+//       OR Contact LIKE '%' + @Search + '%'
+//    ORDER BY PatientId DESC
+//    OFFSET (@Page - 1) * @PageSize ROWS
+//    FETCH NEXT @PageSize ROWS ONLY;
+
+//--TOTAL COUNT
+//SELECT COUNT(*)
+//    FROM Patients
+//    WHERE PatientName LIKE '%' + @Search + '%'
+//       OR Contact LIKE '%' + @Search + '%';
+//END

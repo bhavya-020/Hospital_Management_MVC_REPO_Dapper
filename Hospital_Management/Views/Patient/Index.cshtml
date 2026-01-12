@@ -33,6 +33,25 @@
     <a asp-action="Create" class="btn btn-primary">Add New Patient</a>
 </p>
 
+<form method="get" class="row mb-3">
+    <div class="col-md-4">
+        <input type="text"
+               name="search"
+               value="@ViewBag.Search"
+               class="form-control"
+               placeholder="Search patient name or phone" />
+    </div>
+
+    <div class="col-md-2">
+        <button class="btn btn-primary w-100">Search</button>
+    </div>
+
+    <div class="col-md-2">
+        <a asp-action="Index" class="btn btn-secondary w-100">Clear</a>
+    </div>
+</form>
+
+
 <table class="table table-bordered table-striped">
     <thead>
         <tr>
@@ -40,6 +59,7 @@
             <th>Age</th>
             <th>Gender</th>
             <th>Contact</th>
+            <th>Time</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -51,6 +71,10 @@
                 <td>@p.Age</td>
                 <td>@p.Gender</td>
                 <td>@p.Contact</td>
+                @* <td>@p.CreatedTime.ToString(@"hh\:mm")</td> *@
+
+                <td>@p.CreatedOn.ToString("dd-MM-yyyy hh:mm tt")</td>
+
                 <td>
                     <a asp-action="Edit" asp-route-id="@p.PatientId" class="btn btn-warning btn-sm">
                         Edit

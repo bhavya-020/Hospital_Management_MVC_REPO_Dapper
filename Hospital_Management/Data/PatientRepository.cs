@@ -45,20 +45,35 @@ namespace Hospital_Management.Data
         {
             using var db = new SqlConnection(_con);
 
+            var param = new DynamicParameters();
+            param.Add("@PatientId", m.PatientId);
+            param.Add("@PatientName", m.PatientName);
+            param.Add("@Age", m.Age);
+            param.Add("@Gender", m.Gender);
+            param.Add("@Contact", m.Contact);
+            //param.Add("@CreatedTime" , m.CreatedTime);
+
             db.Execute(
                 "sp_Patient_Insert",
-                m,
+                param,
                 commandType: CommandType.StoredProcedure
             );
+            
         }
 
         public void Update(PatientModel m)
         {
             using var db = new SqlConnection(_con);
 
+            var param = new DynamicParameters();
+            param.Add("@PatientId", m.PatientId);
+            param.Add("@PatientName", m.PatientName);
+            param.Add("@Age", m.Age);
+            param.Add("@Gender", m.Gender);
+            param.Add("@Contact", m.Contact);
             db.Execute(
                 "sp_Patient_Update",
-                m,
+                param,
                 commandType: CommandType.StoredProcedure
             );
         }
@@ -73,5 +88,33 @@ namespace Hospital_Management.Data
                 commandType: CommandType.StoredProcedure
             );
         }
+
+        ////
+        ///
+
+        public (List<PatientModel> patients, int totalCount) GetAllFiltered(
+    string search,
+    int page,
+    int pageSize)
+        {
+            using var db = new SqlConnection(_con);
+
+            var param = new DynamicParameters();
+            param.Add("@Search", search);
+            param.Add("@Page", page);
+            param.Add("@PageSize", pageSize);
+
+            using var multi = db.QueryMultiple(
+                "sp_Patient_GetAll_Filtered",
+                param,
+                commandType: CommandType.StoredProcedure
+            );
+
+            var patients = multi.Read<PatientModel>().ToList();
+            int totalCount = multi.Read<int>().Single();
+
+            return (patients, totalCount);
+        }
+
     }
 }

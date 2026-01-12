@@ -10,5 +10,11 @@ namespace Hospital_Management.Repositories
         void Insert(PatientModel patient);
         void Update(PatientModel patient);
         void Delete(int id);
+
+        (List<PatientModel> patients, int totalCount) GetAllFiltered(
+        string search,
+        int page,
+        int pageSize
+        );
     }
 }

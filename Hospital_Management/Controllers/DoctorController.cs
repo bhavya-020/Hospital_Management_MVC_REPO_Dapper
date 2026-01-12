@@ -14,10 +14,20 @@ namespace Hospital_Management.Controllers
             _repo = repo;
         }
 
-        public IActionResult Index()
+
+        public IActionResult Index(string search, int page = 1)
         {
-            var doctors = _repo.GetAll();
-            return View(doctors);
+            int pageSize = 10;
+
+            var result = _repo.GetAllFiltered(search, page, pageSize);
+
+            ViewBag.Search = search;
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = (int)Math.Ceiling(result.totalCount / (double)pageSize);
+
+            return View(result.doctors);
+            //var doctors = _repo.GetAll();
+            //return View(doctors);
         }
 
         public IActionResult Create()
@@ -115,5 +125,11 @@ namespace Hospital_Management.Controllers
                 new SelectListItem { Text = "Other", Value = "Other" }
             };
         }
+
+
+        //////
+        ///
+
+
     }
 }

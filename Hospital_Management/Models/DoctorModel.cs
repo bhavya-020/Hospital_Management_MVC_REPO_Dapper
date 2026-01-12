@@ -35,6 +35,8 @@ namespace Hospital_Management.Models
         [Range(0, 70, ErrorMessage = "Experience must be between 0 and 70 years")]
         //[Phone]
         public int Experience { get; set; }
+
+        public DateTime CreatedOn { get; set; }
         public List<SelectListItem>? SpecializationList { get; set; }
 
     }
